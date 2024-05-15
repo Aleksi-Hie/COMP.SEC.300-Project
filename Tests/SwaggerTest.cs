@@ -1,19 +1,9 @@
-<<<<<<< HEAD
 ﻿using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
-using OpenQA.Selenium.DevTools.V120.Profiler;
-using SharpYaml.Tokens;
-using OpenQA.Selenium;
-using System.Runtime.CompilerServices;
-using OpenQA.Selenium.DevTools.V120.Autofill;
 using System.Text.Json;
 using Microsoft.OpenApi.Any;
+using System.Security.Cryptography;
 namespace SecureProgrammingProject.Tests
+
 {
     internal class SwaggerTest : BaseTester
     {
@@ -272,7 +262,7 @@ namespace SecureProgrammingProject.Tests
 
                 object val = GetValue(pair.Value);
                 
-                if (val is IEnumerable<IOpenApiAny> array) // Check if the value is an array
+                if (val is IEnumerable<IOpenApiAny> array) //Parse array items
                 {
                     List<object> arrayItems = recursiveLists(array);
                     serializedDictionary[pair.Key] = arrayItems;
@@ -316,12 +306,11 @@ namespace SecureProgrammingProject.Tests
         }
         static private string CreateRandomValueFromSchema(OpenApiSchema schema, Boolean typeMixing)
         {
-            Random random = new Random();
-            int length = random.Next(1, 100);
+            int length = RandomNumberGenerator.GetInt32(1, 100);
 
             if (typeMixing)
             {
-                int typeIndex = random.Next(4);
+                int typeIndex = RandomNumberGenerator.GetInt32(4);
                 switch (typeIndex)
                 {
                     case 0:
@@ -343,166 +332,36 @@ namespace SecureProgrammingProject.Tests
             {
                 var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
                 return new string(Enumerable.Repeat(chars, length)
-                    .Select(s => s[random.Next(s.Length)]).ToArray());
+                    .Select(s => s[RandomNumberGenerator.GetInt32(s.Length)]).ToArray());
             }
             else if (schema.Type == "integer")
             {
-                return new string(random.Next(0, int.MaxValue).ToString());
+                return new string(RandomNumberGenerator.GetInt32(0, int.MaxValue).ToString());
             }
             else if (schema.Type == "boolean")
             {
-                return new string((random.Next(2) == 0).ToString());
+                return new string((RandomNumberGenerator.GetInt32(2) == 0).ToString());
             }
             else if (schema.Type == "number")
             {
-                return new string((random.NextDouble() * (length)).ToString());
+                return new string((
+                    GetRandomDouble() * (length)).ToString());
             }
             else
             {
                 throw new ArgumentException("Unsupported type");
             }
         }
-    }
-}
-
-=======
-﻿using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
-using OpenQA.Selenium.DevTools.V120.Profiler;
-using SharpYaml.Tokens;
-using OpenQA.Selenium;
-using System.Runtime.CompilerServices;
-using OpenQA.Selenium.DevTools.V120.Autofill;
-
-namespace SecureProgrammingProject.Tests
-{
-    internal class SwaggerTest : BaseTester
-    {
-        protected override string testName => "Swagger Test";
-        private OpenApiDocument SwaggerDoc;
-        private HttpClient client;
-        public SwaggerTest(String filename)
+        private static Double GetRandomDouble()
         {
-            this.SwaggerDoc = swaggerParser.ReadLocalSwaggerFile(filename);
-            this.client = new HttpClient();
-        }
-
-
-        public override void RunTest(string address, StringWriter resultsStream)
-        {
-            PositiveCases(address);
-            FinalReport();
-        }
-
-        private void PositiveCases(string address)
-        {
-           foreach(var Path in SwaggerDoc.Paths)
-            {
-                String URL = Path.Key;
-                List<Task> tasks = new List<Task>();
-                foreach (var Operation in Path.Value.Operations)
-                {
-                    String method = Operation.Key.ToString();
-                    tasks.Add(SendRequest(this, client,address+URL, method, Operation.Value.Parameters, Operation.Value.RequestBody, Operation.Value.Responses));
-               }
-                Task.WaitAll(tasks.ToArray());
-           }
-        }
-
-
-        private static async Task SendRequest(SwaggerTest tester, HttpClient client, string URL, string method, IList<OpenApiParameter> httpParams,OpenApiRequestBody body, OpenApiResponses expected)
-        {
-            IList<OpenApiParameter> pathParams = httpParams.Where(p => p.In.Value.Equals("path")).ToList();
-            IList<OpenApiParameter> QueryParams = httpParams.Where(p => p.In.Value.Equals("query")).ToList();
-
-            if(pathParams.Count() > 0)
-            {
-                foreach(var Path in pathParams)
-                {
-                    URL += Path.Name;
-                }
-            }
-            if(QueryParams.Count() > 0)
-            {
-                URL = URL + "?";
-
-                foreach(var param in QueryParams)
-                {
-                    URL = URL + param.Name;
-                    if (param != QueryParams.Last())
-                    {
-                        URL = URL + "&";
-                    }
-                }
-            }
-            using var request = new HttpRequestMessage(new HttpMethod(method.ToUpper()), URL);
-
-
-            foreach (var param in httpParams)
-            {
-                if (param.In.Value.Equals("header"))
-                {
-                    request.Headers.Add(param.Name, param.Schema.Default.ToString());
-                }
-                if (param.In.Value.Equals("cookies"))
-                {
-                    Console.WriteLine("Cookie params not supported");
-                    return;
-                }
-            }
-            if (body != null)
-            {
-
-                String content = "";
-                foreach(var param in body.Content)
-                {
-                    request.Headers.Add("Content-Type", param.Key.ToString());
-                    try
-                    {
-                        if (param.Value.Examples.Count() > 0)
-                        {
-                            foreach (var example in param.Value.Examples)
-                            {
-                                content += example.Key;
-                                //Funny name but is correct
-                                content += example.Value.Value;
-                            }
-                        }
-                        else if (param.Value.Example != null)
-                        {
-                            content += param.Value.Example.ToString();
-                        }
-                        else if(param.Value.Schema != null && param.Value.Schema.Example != null)
-                        {
-                            content += param.Value.Schema.Example.ToString();
-                        }
-                    }
-                    catch (NullReferenceException ex)
-                    {
-                        
-                        Console.WriteLine(ex.ToString());
-                        continue;
-                    }
-                    
-                }
-            }
-            using var response = await client.SendAsync(request);
-            int rescode = (int)response.StatusCode;
-             if (rescode.ToString() != expected.FirstOrDefault().Key.ToString())
-            {
-                tester.testRan(tester.failed);
-            }
-            else
-            {
-                tester.testRan(tester.passed);
-            }
-            //TODO ADD CHECKS FOR BODY AND HEADERS
+            var rng = RandomNumberGenerator.Create();
+            var bytes = new Byte[8];
+            rng.GetBytes(bytes);
+            var ul = BitConverter.ToUInt64(bytes, 0) / (1 << 11);
+            return  ul / (Double)(1UL << 53);
         }
     }
+
+
 }
->>>>>>> 534183718ef6d07849b46bbcf4c532876b779d53
+

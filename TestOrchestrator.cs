@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-=======
-<<<<<<<< HEAD:TestOrchestrator.cs
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,40 +9,6 @@ namespace SecureProgrammingProject
 {
     internal class TestOrchestrator
     {
-        private List<TestInterface> testers;
-        private String address;
-        public TestOrchestrator(String address)
-        {
-            this.address = address;
-
-            testers = new List<TestInterface>
-            { 
-                new SwaggerTest("C:\\Users\\aleks\\Documents\\clever-name\\backend\\server-a\\api\\swagger.yaml")
-            };
-        }
-        public void Run()
-        {
-            foreach (TestInterface tester in testers)
-            {
-                tester.RunTest(address, new StringWriter());
-            }
-        }
-    }
-}
-========
->>>>>>> 534183718ef6d07849b46bbcf4c532876b779d53
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SecureProgrammingProject.Tests;
-
-namespace SecureProgrammingProject
-{
-    internal class TestOrchestrator
-    {
-<<<<<<< HEAD
 
 
         private String address;
@@ -59,14 +22,22 @@ namespace SecureProgrammingProject
             foreach (char testKey in tests)
             {
                 TestInterface testObject = null;
-
+                if (testers.TryGetValue(testKey, out testObject)) {
+                    Console.WriteLine("Multiple copies of test detected only 1 will be initialized");
+                    continue;
+                }
                 switch (testKey)
                 {
+                    
                     case '1':
                         Console.WriteLine("Give password list filepath or leave empty for default file in cwd: ");
                         string path =  Console.ReadLine();
                         Console.WriteLine("Path of login portal: ");
                         string portal = Console.ReadLine();
+                        if(portal == null)
+                        {
+                            portal = "";
+                        }
                         if (path == "")
                         {
                             testObject = new CommonPasswordsTest(portal);
@@ -98,10 +69,14 @@ namespace SecureProgrammingProject
                         break;
                 }
 
-                // Add initialized test object to the dictionary if it's not null
                 if (testObject != null)
                 {
-                    testers.Add(testKey, testObject);
+                    try
+                    {
+                        testers.Add(testKey, testObject);
+                    }
+                    catch (Exception e) { Console.WriteLine("Multiple copies of test detected");}
+                    
                 }
             }
 
@@ -113,33 +88,10 @@ namespace SecureProgrammingProject
                 }
                 else
                 {
-                    Console.WriteLine("Unrecognised tests: " + c);
+                    Console.WriteLine("Failed to initialize test: " + c);
                 }
             }
 
         }
     }
 }
-=======
-        private List<TestInterface> testers;
-        private String address;
-        public TestOrchestrator(String address)
-        {
-            this.address = address;
-
-            testers = new List<TestInterface>
-            {
-                new SwaggerTest("C:\\Users\\aleksi\\Documents\\webdev2 projekti\\webdev2\\backend\\server-a\\api\\swagger.yaml")
-            };
-        }
-        public void Run()
-        {
-            foreach (TestInterface tester in testers)
-            {
-                tester.RunTest(address, new StringWriter());
-            }
-        }
-    }
-}
->>>>>>>> 534183718ef6d07849b46bbcf4c532876b779d53:SecureProgrammingProject/TestOrchestrator.cs
->>>>>>> 534183718ef6d07849b46bbcf4c532876b779d53
