@@ -1,0 +1,57 @@
+# This is where you define the image for
+# the server A, which implements the Swagger API.
+
+# Start by copying the server stub to this directory.
+
+# You should then use Noje image from Docker Hub as the basis,
+# and then follow the instructions linked to in assignment document.
+# You should be able to produce a working installation by just
+# following the instructions.
+
+# First line is provided for your convenience.
+# This line fetches the Node Docker image with tag "10"
+# from Docker Hub.
+
+
+# Copy the server stub to the image.
+# The server stub is in the same directory as this Dockerfile.
+
+version: '3'
+services:
+  serverA:
+    image: node:10
+    container_name: serverA
+    volumes:
+      - .:/home/node/app
+    working_dir: /home/node/app
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    command: "npm run start"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-container
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: myuser
+      RABBITMQ_DEFAULT_PASS: mypassword
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  node-server-b:
+    image: "node:10"
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: production
+    volumes:
+      - ./:/home/node/app
+    ports:
+      - "8888:8888"
+    command: "npm start"
+
+
+    

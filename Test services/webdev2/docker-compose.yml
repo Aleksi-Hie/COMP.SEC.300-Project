@@ -1,0 +1,45 @@
+# This is the docker-compose-yml file that must be able to start
+# your group's backend.
+
+# Remember to comment this file well!
+
+# After you have Docker and Docker Compose installed,
+# and this file is ready, you use this file and run it with:
+# `docker-compose up --build`
+
+version: "3"
+
+services:
+  #! Own Section !#
+
+  # Server A
+  serverA:
+    image: node:10
+    container_name: serverA
+    volumes:
+      - ./backend/server-a:/home/node/app # Accessed from ./backend/server-a
+    working_dir: /home/node/app
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    command: "npm run start" # Execute the file in directory
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-container
+    hostname: rabbitmq # Hostname that tasks connect to
+    environment:
+      RABBITMQ_DEFAULT_USER: myuser
+      RABBITMQ_DEFAULT_PASS: mypassword
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck: # Check health of container, for the conditional of server-b
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 10s
+      retries: 10
+
+  #! End of Own Section !#
