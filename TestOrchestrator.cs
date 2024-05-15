@@ -21,7 +21,7 @@ namespace SecureProgrammingProject
             Dictionary<char, TestInterface> testers = new Dictionary<char, TestInterface>();
             foreach (char testKey in tests)
             {
-                TestInterface testObject = null;
+                TestInterface? testObject = null;
                 if (testers.TryGetValue(testKey, out testObject)) {
                     Console.WriteLine("Multiple copies of test detected only 1 will be initialized");
                     continue;
@@ -31,21 +31,25 @@ namespace SecureProgrammingProject
                     
                     case '1':
                         Console.WriteLine("Give password list filepath or leave empty for default file in cwd: ");
-                        string path =  Console.ReadLine();
+                        string? path =  Console.ReadLine();
                         Console.WriteLine("Path of login portal: ");
-                        string portal = Console.ReadLine();
-                        if(portal == null)
+                        string? portal = Console.ReadLine();
+                        if(portal == null || portal == "")
                         {
                             portal = "";
                         }
-                        if (path == "")
+                        if (path == null || path == "")
                         {
                             testObject = new CommonPasswordsTest(portal);
                         }
                         else
                         {
                             Console.WriteLine("Give delimiter for the file username / password combinations: ");
-                            string delimiter = Console.ReadLine();
+                            string? delimiter = Console.ReadLine();
+                            if (delimiter == null || delimiter == "")
+                            {
+                                delimiter = "";
+                            }
                             testObject = new CommonPasswordsTest(path, delimiter, portal);
                         }
                         break;
@@ -54,12 +58,17 @@ namespace SecureProgrammingProject
                         break;
                     case '3':
                         Console.WriteLine("Give path to swagger file: ");
-                        string swaggerPath = Console.ReadLine();
+                        string? swaggerPath = Console.ReadLine();
+                        if (swaggerPath == null || swaggerPath == "")
+                        {
+                            swaggerPath = "";
+                        }
                         try
                         {
                             testObject = new SwaggerTest(swaggerPath);
+
                         }
-                        catch(Exception e)
+                        catch(Exception)
                         {
                             Console.WriteLine($"Swagger file not found: '{swaggerPath}'");
                         };
@@ -75,7 +84,7 @@ namespace SecureProgrammingProject
                     {
                         testers.Add(testKey, testObject);
                     }
-                    catch (Exception e) { Console.WriteLine("Multiple copies of test detected");}
+                    catch (Exception) { Console.WriteLine("Multiple copies of test detected");}
                     
                 }
             }

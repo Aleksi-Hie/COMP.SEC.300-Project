@@ -71,9 +71,13 @@ namespace SecureProgrammingProject.Tests
 
         public CommonPasswordsTest(String filename, String delimiter, string portal)
         {
-            if (filename == null) LoadFile(DefaultFilename, delimiter);
+            if(filename != null &&  delimiter != null)
+            {
+                LoadFile(filename, delimiter);
+            }
+            //load using default
+            if (filename == null) LoadFile(DefaultFilename);
             else if (filename != null && delimiter == null) throw new ArgumentException("Missing delimiter. File should be in the form usernames'delimiter'password");
-            else { LoadFile(filename, delimiter); }
             this.portal = portal;
         }
 
@@ -96,9 +100,9 @@ namespace SecureProgrammingProject.Tests
             {
                 return;
             }
-            IWebElement usernameField = null;
-            IWebElement passwordField = null;
-            IWebElement SubmitButton = null;
+            IWebElement? usernameField = null;
+            IWebElement? passwordField = null;
+            IWebElement? SubmitButton = null;
             try
             {
                  usernameField = FindElement("input", "name",Commonusernamefields );
@@ -139,7 +143,7 @@ namespace SecureProgrammingProject.Tests
 
                 }
 
-                catch (ArgumentException ex)
+                catch (ArgumentException)
                 {
                     InitDriver(address);
                     testRan(failed);
@@ -148,7 +152,7 @@ namespace SecureProgrammingProject.Tests
                     continue;
 
                 }
-                catch (OpenQA.Selenium.StaleElementReferenceException ex)
+                catch (OpenQA.Selenium.StaleElementReferenceException)
                 {
                     usernameField = FindElement("input", "name", Commonusernamefields);
                     passwordField = FindElement("input", "name", Commonpasswordfields);

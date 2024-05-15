@@ -58,16 +58,19 @@ namespace SecureProgrammingProject.Tests
 
         private static async Task SendRequest(SwaggerTest tester, HttpClient client, string URL, string method, IList<OpenApiParameter> httpParams, OpenApiRequestBody body, OpenApiResponses expected)
         {
+#pragma warning disable CS8629
             IList<OpenApiParameter> pathParams = httpParams.Where(p => string.Equals(p.In.Value.ToString(), "Path", StringComparison.OrdinalIgnoreCase)).ToList();
             IList<OpenApiParameter> QueryParams = httpParams.Where(p => p.In.Value.Equals("query")).ToList();
             URL = AddPathParams(URL, pathParams, QueryParams, false);
-
+#pragma warning restore CS8629
             using var request = new HttpRequestMessage(new HttpMethod(method.ToUpper()), URL);
 
 
             foreach (var param in httpParams)
             {
+#pragma warning disable CS8629
                 if (param.In.Value.Equals("header"))
+#pragma warning restore CS8629  
                 {
                     request.Headers.Add(param.Name, param.Schema.Default.ToString());
                 }
@@ -106,14 +109,18 @@ namespace SecureProgrammingProject.Tests
 
         static private async Task RandomCases(SwaggerTest tester, HttpClient client, string URL, string method, IList<OpenApiParameter> httpParams, OpenApiRequestBody body, OpenApiResponses expected)
         {
+#pragma warning disable CS8629
             IList<OpenApiParameter> pathParams = httpParams.Where(p => string.Equals(p.In.Value.ToString(), "Path", StringComparison.OrdinalIgnoreCase)).ToList();
             IList<OpenApiParameter> QueryParams = httpParams.Where(p => p.In.Value.Equals("query")).ToList();
+#pragma warning restore CS8629
             URL = AddPathParams(URL, pathParams, QueryParams, true);
             using var request = new HttpRequestMessage(new HttpMethod(method.ToUpper()), URL);
 
             foreach (var param in httpParams)
             {
+#pragma warning disable CS8629
                 if (param.In.Value.Equals("header"))
+#pragma warning restore CS8629
                 {
                     request.Headers.Add(param.Name, param.Schema.Default.ToString());
                 }
@@ -253,7 +260,7 @@ namespace SecureProgrammingProject.Tests
             }
         }
 
-        static private string parseToJson(IDictionary<string, IOpenApiAny> items, int depth = 0)
+        static private string parseToJson(IDictionary<string, IOpenApiAny> items)
         {
             Dictionary<string, object> serializedDictionary = new Dictionary<string, object>();
 

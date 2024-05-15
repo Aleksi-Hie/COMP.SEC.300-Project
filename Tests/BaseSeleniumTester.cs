@@ -41,7 +41,7 @@ namespace SecureProgrammingProject.Tests
                 driver.Quit();
                 return false;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return false;
             }

@@ -79,7 +79,7 @@ namespace SecureProgrammingProject.Tests
                         FailureReport($"Injection vulnerability at {driver.Url}, in field: URL, with arguments: {injection}");
                     }
                 }
-                catch (OpenQA.Selenium.WebDriverException e)
+                catch (OpenQA.Selenium.WebDriverException)
                 {
                     testRan(passed);
                     continue;
@@ -108,7 +108,7 @@ namespace SecureProgrammingProject.Tests
                                 testRan(failed);
                             }
                         }
-                        catch (OpenQA.Selenium.WebDriverException e)
+                        catch (OpenQA.Selenium.WebDriverException)
                         {
                             testRan(passed);
                             continue;
@@ -117,7 +117,7 @@ namespace SecureProgrammingProject.Tests
 
                 }
             }
-            catch(OpenQA.Selenium.UnhandledAlertException e) {
+            catch(OpenQA.Selenium.UnhandledAlertException) {
                 FailureReport($"Injection vulnerability at {driver.Url}");
             }
             
@@ -140,7 +140,7 @@ namespace SecureProgrammingProject.Tests
                 driver.SwitchTo().Alert().Accept();
                 return true;
             }
-            catch (OpenQA.Selenium.NoAlertPresentException ex)
+            catch (OpenQA.Selenium.NoAlertPresentException)
             {
                 return false;
             }

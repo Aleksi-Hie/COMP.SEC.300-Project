@@ -4,18 +4,18 @@ namespace SecureProgrammingProject
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
 
             Console.WriteLine("Select tests: 1 = Password tester, 2 = Injection test, 3 = Swagger test");
-            string tests = Console.ReadLine();
-            if(tests == "")
+            string? tests = Console.ReadLine();
+            if(tests == null || tests == "")
             {
                 Console.WriteLine("No tests selected");
                 return;
             }
             tests = tests.Trim();
-            List<char> test_ = new List<char>();
+            List<char> test_ = [];
             foreach(char c in tests)
             {
                 if(c == ' ')
@@ -33,8 +33,8 @@ namespace SecureProgrammingProject
             }
 
             Console.WriteLine("Give address to server, it should include http:// or https://");
-            string serveraddress = Console.ReadLine();
-            if(serveraddress == "")
+            string? serveraddress = Console.ReadLine();
+            if(serveraddress == null || serveraddress == "")
             {
                 Console.WriteLine("No server address given");
                 return;
